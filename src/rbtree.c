@@ -5,12 +5,19 @@
 rbtree *new_rbtree(void) {
   rbtree *p = (rbtree *)calloc(1, sizeof(rbtree));
   // TODO: initialize struct if needed
+  p->nil=(node_t*)calloc(1,sizeof(node_t));
+  p->nil->color=RBTREE_BLACK;
+  p->root=p->nil;
+
   return p;
 }
 
 void delete_rbtree(rbtree *t) {
   // TODO: reclaim the tree nodes's memory
+  free(t->nil);
+  t->nil = NULL;
   free(t);
+  t = NULL;
 }
 
 node_t *rbtree_insert(rbtree *t, const key_t key) {
