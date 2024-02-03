@@ -18,15 +18,30 @@ typedef struct {
   node_t *nil;  // for sentinel
 } rbtree;
 
-rbtree *new_rbtree(void);
-void delete_rbtree(rbtree *);
+rbtree    *new_rbtree(void);
+void      delete_rbtree(rbtree *);
 
-node_t *rbtree_insert(rbtree *, const key_t);
-node_t *rbtree_find(const rbtree *, const key_t);
-node_t *rbtree_min(const rbtree *);
-node_t *rbtree_max(const rbtree *);
-int rbtree_erase(rbtree *, node_t *);
+node_t    *rbtree_insert(rbtree *, const key_t);
+node_t    *rbtree_find(const rbtree *, const key_t);
+node_t    *rbtree_min(const rbtree *);
+node_t    *rbtree_max(const rbtree *);
+int       rbtree_erase(rbtree *, node_t *);
 
-int rbtree_to_array(const rbtree *, key_t *, const size_t);
+int       rbtree_to_array(const rbtree *, key_t *, const size_t);
+
+
+/* insert.c*/
+void      insert_fixed(rbtree *,node_t *);
+void      insert_binary(rbtree *, node_t *);
+
+/* util.c */
+node_t      *get_grandparent(rbtree *,node_t *);
+node_t      *get_uncle(rbtree *, node_t *);
+void        rotate_left(rbtree *, node_t *);
+void        rotate_right(rbtree *, node_t *);
+void        free_inorder_traversal(rbtree *, node_t *);
+
+
+
 
 #endif  // _RBTREE_H_
