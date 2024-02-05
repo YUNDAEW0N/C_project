@@ -25,12 +25,15 @@ node_t *get_uncle(rbtree *t, node_t *n)
 //형제 노드 가져오기
 node_t *get_sibling(rbtree*t, node_t *n)
 {
-    printf("!\n");
-    if(n == n->parent->left)
-        return n->parent->right;
+    if (n == t->nil || n->parent == t->nil)
+        return t->nil;
+
+    node_t *parent = n->parent;
+
+    if (n == parent->left)
+        return parent->right;
     else
-        return n->parent->left;
-    printf("!\n");
+        return parent->left;
 }
 
 //로테이트 레프트

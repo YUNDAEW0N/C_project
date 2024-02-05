@@ -120,7 +120,7 @@ void delete_node(rbtree *t, node_t *n)
     printf("n->color: %d, child->color: %d\n", n->color, child->color);
     if (n->color == RBTREE_BLACK)
     {
-        printf("if 문 들어오나 ?");
+        printf("if 문 들어오나 ?\n");
         if (child->color == RBTREE_RED)
         {
             child->color = RBTREE_BLACK;
@@ -129,8 +129,9 @@ void delete_node(rbtree *t, node_t *n)
         else
         { // case 1:
             printf("fixed 호출\n");
-            visualize_tree(t,4);
-            erase_fixed(t, n, child);
+            erase_fixed(t, child);
+            printf("fixed 호출\n");
+            //visualize_tree(t,4);
             
         }
     }
@@ -138,20 +139,18 @@ void delete_node(rbtree *t, node_t *n)
 }
 
 
-void erase_fixed(rbtree *t, node_t *n, node_t *child)
+void erase_fixed(rbtree *t, node_t *n)
 {
 
-    if (n->parent == t->nil){
+   if (n->parent == t->nil){
         return;
     }
-    node_t *s;
-    //  = get_sibling(t, child);
-        
+    node_t *s = get_sibling(t, n);
+
     // case 2:
     if (s->color == RBTREE_RED)
     {
-        s = get_sibling(t, child);
-        printf("case 2 들어오니?\n");
+        printf("erase_fixed: case 2 들어오니?\n");
         n->parent->color = RBTREE_RED;
         s->color = RBTREE_BLACK;
 
@@ -161,70 +160,62 @@ void erase_fixed(rbtree *t, node_t *n, node_t *child)
             rotate_right(t, n->parent);
     }
     // case 3:
-    if ((n->parent->color == RBTREE_BLACK) &&
-        (s->color == RBTREE_BLACK) &&
-        (s->left->color == RBTREE_BLACK) &&
-        (s->right->color == RBTREE_BLACK))
+    else if ((n->parent->color == RBTREE_BLACK) &&
+             (s->color == RBTREE_BLACK) &&
+             (s->left->color == RBTREE_BLACK) &&
+             (s->right->color == RBTREE_BLACK))
     {
-        s = get_sibling(t, child);
-        printf("case 3 들어오니?\n");
-        printf("%d %d %d",s->key, n->key, n->parent->key);
-        s->color=RBTREE_RED;
-        erase_fixed(t, n->parent, child);
+        printf("erase_fixed: case 3 들어오니?\n");
+        s->color = RBTREE_RED;
+        erase_fixed(t, n->parent);
     }
+    // case 4:
+    else if ((n->parent->color == RBTREE_RED) &&
+             (s->color == RBTREE_BLACK) &&
+             (s->left->color == RBTREE_BLACK) &&
+             (s->right->color == RBTREE_BLACK))
+    {
+        printf("erase_fixed: case 4 들어오니?\n");
+        s->color = RBTREE_RED;
+        n->parent->color = RBTREE_BLACK;
+    }
+    // case 5:
+    else if (s->color == RBTREE_BLACK)
+    {
+        if ((n == n->parent->left) &&
+            (s->right->color == RBTREE_BLACK) &&
+            (s->left->color == RBTREE_RED))
+        {
+            printf("erase_fixed: case 5 들어오니?\n");
+            s->color = RBTREE_RED;
+            s->left->color = RBTREE_BLACK;
+            rotate_right(t, s);
+        }
+        else if ((n == n->parent->right) &&
+                 (s->left->color == RBTREE_BLACK) &&
+                 (s->right->color == RBTREE_RED))
+        {
+            s->color = RBTREE_RED;
+            s->right->color = RBTREE_BLACK;
+            rotate_left(t, s);
+        }
+    }
+    // case 6:
     else
     {
-        // case 4:
-        s = get_sibling(t, child);
-        if ((n->parent->color == RBTREE_RED) &&
-            (s->color == RBTREE_BLACK) &&
-            (s->left->color == RBTREE_BLACK) &&
-            (s->right->color == RBTREE_BLACK))
+        printf("erase_fixed: case 6 들어오니?\n");
+        s->color = n->parent->color;
+        n->parent->color = RBTREE_BLACK;
+
+        if (n == n->parent->left)
         {
-            printf("case 4 들어오니?\n");
-            s->color = RBTREE_RED;
-            n->parent->color = RBTREE_BLACK;
+            s->right->color = RBTREE_BLACK;
+            rotate_left(t, n->parent);
         }
         else
         {
-            // case 5:
-            s = get_sibling(t, child);
-            if (s->color == RBTREE_BLACK)
-            {
-                printf("case 5 들어오니?\n");
-                if ((n == n->parent->left) &&
-                    (s->right->color == RBTREE_BLACK) &&
-                    (s->left->color == RBTREE_RED))
-                {
-                    s->color = RBTREE_RED;
-                    s->left->color = RBTREE_BLACK;
-                    rotate_right(t, s);
-                }
-                else if ((n == n->parent->right) &&
-                         (s->left->color == RBTREE_BLACK) &&
-                         (s->right->color == RBTREE_RED))
-                {
-                    s->color = RBTREE_RED;
-                    s->right->color = RBTREE_BLACK;
-                    rotate_left(t, s);
-                }
-            }
-            // case 6:
-            s = get_sibling(t, child);
-            printf("case 6 들어오니?");
-            s->color = n->parent->color;
-            n->parent->color = RBTREE_BLACK;
-
-            if (n == n->parent->left)
-            {
-                s->right->color = RBTREE_BLACK;
-                rotate_left(t, n->parent);
-            }
-            else
-            {
-                s->left->color = RBTREE_BLACK;
-                rotate_right(t, n->parent);
-            }
+            s->left->color = RBTREE_BLACK;
+            rotate_right(t, n->parent);
         }
     }
 }

@@ -37,7 +37,7 @@ void      insert_binary(rbtree *, node_t *);
 
 /* erase.c */
 node_t    *tree_minimum(rbtree *, node_t *);
-void      erase_fixed(rbtree *,node_t *, node_t *);
+void      erase_fixed(rbtree *,node_t *);
 void      replace_node(rbtree *,node_t *,node_t *);
 void    *erase_binary(rbtree *, node_t *);
 void      delete_node(rbtree *, node_t *);

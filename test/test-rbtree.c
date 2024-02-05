@@ -392,22 +392,20 @@ void test_to_array_suite() {
 }
 
 void test_find_erase(rbtree *t, const key_t *arr, const size_t n) {
-  printf("test_find_erase\n");
+  //printf("test_find_erase\n");
 
   for (int i = 0; i < n; i++) {
     node_t *p = rbtree_insert(t, arr[i]);
     assert(p != NULL);
   }
-  // visualize_tree(t,4);
-  // printf("@@@@@@@@@@@@@@@@@@@@");
+
   for (int i = 0; i < n; i++) {
     
     node_t *p = rbtree_find(t, arr[i]);
     assert(p != NULL);
     assert(p->key == arr[i]);
     rbtree_erase(t, p);
-    visualize_tree(t,4);
-    printf("test_find_erase1\n");
+    // printf("test_find_erase1\n");
  
   }
 
