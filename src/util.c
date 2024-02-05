@@ -1,4 +1,6 @@
 #include "rbtree.h"
+#include <stdlib.h>
+
 
 //할아버지 노드 가져오는 함수
 node_t *get_grandparent(rbtree *t,node_t *n)
@@ -20,6 +22,17 @@ node_t *get_uncle(rbtree *t, node_t *n)
     return g->left;
 }
 
+//형제 노드 가져오기
+node_t *get_sibling(rbtree*t, node_t *n)
+{
+    printf("!\n");
+    if(n == n->parent->left)
+        return n->parent->right;
+    else
+        return n->parent->left;
+    printf("!\n");
+}
+
 //로테이트 레프트
 void rotate_left(rbtree *t, node_t *n)
 {
@@ -39,7 +52,9 @@ void rotate_left(rbtree *t, node_t *n)
             p->left = c;
         else
             p->right = c;
-    }
+    } else {
+		t->root = c;
+	}
 }
 
 void rotate_right(rbtree *t, node_t *n)
@@ -60,7 +75,9 @@ void rotate_right(rbtree *t, node_t *n)
             p->right = c;
         else
             p->left = c;
-    }
+    } else {
+		t->root = c;
+	}
 }
 
 void free_inorder_traversal(rbtree *t, node_t *root)
@@ -71,4 +88,3 @@ void free_inorder_traversal(rbtree *t, node_t *root)
         free_inorder_traversal(t,root->right);
     }
 }
-

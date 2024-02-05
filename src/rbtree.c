@@ -1,6 +1,7 @@
 #include "rbtree.h"
-
 #include <stdlib.h>
+#include <stdio.h>
+
 
 
 rbtree *new_rbtree(void) {
@@ -53,7 +54,21 @@ node_t *rbtree_insert(rbtree *t, const key_t key) {
 
 node_t *rbtree_find(const rbtree *t, const key_t key) {
   // TODO: implement find
-  return t->root;
+
+  node_t *current = t->root;
+
+    while (current != NULL && current != t->nil) {
+        if (key == current->key) {
+            // Key found
+            return current;
+        } else if (key < current->key) {
+            current = current->left;
+        } else {
+            current = current->right;
+        }
+    }
+    // Key not found
+    return NULL;
 }
 
 node_t *rbtree_min(const rbtree *t) {
@@ -67,7 +82,19 @@ node_t *rbtree_max(const rbtree *t) {
 }
 
 int rbtree_erase(rbtree *t, node_t *p) {
-  // TODO: implement erase
+  // // TODO: implement erase
+  node_t *y;
+  erase_binary(t, p);
+  
+  if (y!=t->nil){
+    delete_node(t, p);
+    printf("delete_node 호출\n");
+  }
+  if(p==t->root)
+  {
+    t->root=t->nil;
+  }
+
   return 0;
 }
 
