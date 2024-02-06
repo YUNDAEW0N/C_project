@@ -91,3 +91,15 @@ void free_inorder_traversal(rbtree *t, node_t *root)
         free_inorder_traversal(t,root->right);
     }
 }
+
+void to_arr_inorder_traversal(rbtree *t, node_t *root, key_t *arr, size_t *index)
+{
+    if (root != t->nil){
+        to_arr_inorder_traversal(t, root->left, arr, index);
+        arr[(*index)++] = root->key; // 현재 노드의 키 값을 배열에 저장
+        to_arr_inorder_traversal(t, root->right, arr, index);
+    }
+}
+
+
+

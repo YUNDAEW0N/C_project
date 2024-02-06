@@ -37,19 +37,19 @@ void test_insert_single(const key_t key) {
   delete_rbtree(t);
 }
 
-static void	  inorder_traversal(rbtree *t, node_t *root) {
-	if (root != t->nil) {
-		inorder_traversal(t, root->left);
-		printf("%d ", root->key);
-		inorder_traversal(t, root->right);
-	}
-}
+// static void	  inorder_traversal(rbtree *t, node_t *root) {
+// 	if (root != t->nil) {
+// 		inorder_traversal(t, root->left);
+// 		printf("%d ", root->key);
+// 		inorder_traversal(t, root->right);
+// 	}
+// }
 
-static void		print_tree_inorder(rbtree *t) {
-	printf("Inorder Traversal: ");
-	inorder_traversal(t, t->root);
-	printf("\n");
-}
+// static void		print_tree_inorder(rbtree *t) {
+// 	printf("Inorder Traversal: ");
+// 	inorder_traversal(t, t->root);
+// 	printf("\n");
+// }
 
 int pow_2(int x) {
   // 2**x 계산 함수
@@ -369,6 +369,7 @@ void test_distinct_values() {
 
 // rbtree should manage values with duplicate
 void test_duplicate_values() {
+  printf("테케함수 호출\n");
   const key_t entries[] = {10, 5, 5, 34, 6, 23, 12, 12, 6, 12};
   const size_t n = sizeof(entries) / sizeof(entries[0]);
   test_rb_constraints(entries, n);
@@ -405,6 +406,7 @@ void test_find_erase(rbtree *t, const key_t *arr, const size_t n) {
     assert(p != NULL);
     assert(p->key == arr[i]);
     rbtree_erase(t, p);
+    // visualize_tree(t,4);
     // printf("test_find_erase1\n");
  
   }
@@ -433,12 +435,12 @@ void test_find_erase_fixed() {
   const size_t n = sizeof(arr) / sizeof(arr[0]);
   rbtree *t = new_rbtree();
   assert(t != NULL);
-  // 디버깅 메시지 추가
-  printf("Before test_find_erase\n");
+  // // 디버깅 메시지 추가
+  // printf("Before test_find_erase\n");
 
   test_find_erase(t, arr, n);
-  // 디버깅 메시지 추가
-  printf("After test_find_erase\n");
+  // // 디버깅 메시지 추가
+  // printf("After test_find_erase\n");
 
   delete_rbtree(t);
 }
@@ -463,12 +465,12 @@ int main(void) {
   test_find_single(512, 1024);
   test_erase_root(128);
   test_find_erase_fixed();
-  // test_minmax_suite();
-  // test_to_array_suite();
-  // test_distinct_values();
-  // test_duplicate_values();
-  // test_multi_instance();
-  // test_find_erase_rand(10000, 17);
+  test_minmax_suite();
+  test_to_array_suite();
+  test_distinct_values();
+  test_duplicate_values();
+  test_multi_instance();
+  test_find_erase_rand(10000, 17);
   printf("Passed all tests!\n");
 }
 

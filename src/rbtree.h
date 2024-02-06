@@ -39,8 +39,9 @@ void      insert_binary(rbtree *, node_t *);
 node_t    *tree_minimum(rbtree *, node_t *);
 void      erase_fixed(rbtree *,node_t *);
 void      replace_node(rbtree *,node_t *,node_t *);
-void    *erase_binary(rbtree *, node_t *);
+void      *erase_binary(rbtree *, node_t *);
 void      delete_node(rbtree *, node_t *);
+void      delete_fixup(rbtree*,node_t*);
 
 /* util.c */
 node_t      *get_grandparent(rbtree *,node_t *);
@@ -49,6 +50,7 @@ void        rotate_left(rbtree *, node_t *);
 void        rotate_right(rbtree *, node_t *);
 void        free_inorder_traversal(rbtree *, node_t *);
 node_t      *get_sibling(rbtree*, node_t *);
+void        to_arr_inorder_traversal(rbtree *, node_t *, key_t *, size_t *);
 
 
 

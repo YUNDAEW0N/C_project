@@ -73,32 +73,49 @@ node_t *rbtree_find(const rbtree *t, const key_t key) {
 
 node_t *rbtree_min(const rbtree *t) {
   // TODO: implement find
-  return t->root;
+  node_t *current;
+  if(t->root!=t->nil){
+    current=t->root;
+    while (current->left!=t->nil)
+    {
+      current=current->left;
+    }
+    return current;
+  }
+  else
+    return t->root;
 }
 
 node_t *rbtree_max(const rbtree *t) {
   // TODO: implement find
-  return t->root;
+    node_t *current;
+  if(t->root!=t->nil){
+    current=t->root;
+    while (current->right!=t->nil)
+    {
+      current=current->right;
+    }
+    return current;
+  }
+  else
+    return t->root;
 }
 
 int rbtree_erase(rbtree *t, node_t *p) {
   // // TODO: implement erase
-  node_t *y;
   erase_binary(t, p);
-  
-  if (y!=t->nil){
-    delete_node(t, p);
-    printf("delete_node 호출\n");
-  }
-  if(p==t->root)
-  {
-    t->root=t->nil;
-  }
-
   return 0;
 }
 
 int rbtree_to_array(const rbtree *t, key_t *arr, const size_t n) {
-  // TODO: implement to_array
-  return 0;
+    // 예외처리: 입력이 유효하지 않은 경우
+    if (t == NULL || arr == NULL) {
+        return -1; // 실패를 나타내는 코드 반환
+    }
+    // 중위 순회를 통해 트리의 모든 요소를 배열에 저장
+    size_t index = 0; // 배열의 인덱스 초기화
+    to_arr_inorder_traversal(t, t->root, arr, &index);
+
+    return 0; // 성공을 나타내는 코드 반환
 }
+

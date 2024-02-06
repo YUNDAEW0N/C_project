@@ -11,7 +11,7 @@ SRCS_OBJ =	rbtree.o\
 
 test: test-rbtree
 	./test-rbtree
-	# valgrind ./test-rbtree
+	valgrind ./test-rbtree
 
 test-rbtree: test-rbtree.o $(addprefix $(SRCS_DIR), $(SRCS_OBJ))
 

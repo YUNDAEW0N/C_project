@@ -67,76 +67,167 @@ static void visualize_tree(rbtree *t, int render_depth) {
 }
 
 
-void replace_node(rbtree *t, node_t *n, node_t *child)
+void replace_node(rbtree *t, node_t *del_target, node_t *swap_target)
 {
-   child->parent = n->parent;
-    if (n->parent != t->nil) {
-        if (n->parent->left == n)
-            n->parent->left = child;
-        else if (n->parent->right == n)
-            n->parent->right = child;
-    } else {
-        // n이 루트 노드인 경우
-        t->root = child; // 트리의 루트를 child로 업데이트
-    }
+  //삭제할 타겟의 부모가 nil 노드 라면?  -> root 라는 얘기겠죵?
+  if (del_target->parent == t->nil)
+      t->root = swap_target; // 루트에 삭제될 자리에 올 타겟 넣어주고
+  //삭제할 타겟이랑 삭제할타겟의 부모의 왼쪽자식이랑 같다면 
+  else if (del_target == del_target->parent->left)
+      del_target->parent->left = swap_target;//삭제할 타겟의 부모의 왼쪽에 대체할놈
+  else
+      del_target->parent->right = swap_target;//반대로 오른쪽의 경우
+  
+  //대체할놈의 부모를 삭제할놈의 부모로 설정
+  swap_target->parent = del_target->parent;
+  
 }
 
 
-void *erase_binary(rbtree *t, node_t *n)
+void *erase_binary(rbtree *t, node_t *del_target)
 {
-    node_t *y;
+  node_t* extra_black=del_target;// RB특성을 위반할 수 있는 노드를 관리하기위한 변수 = 청구서, extra블랙
+  node_t* swap_target; // del_target의 원래 위치에 올 녀석도 RB트리 특성 위반할수있기때문에 만들어놓고 확인
+  color_t successor; // 원래있던자리의 색을 확인하기위한 변수
+  successor = extra_black->color;
 
-    if (n->left == t->nil)
-        replace_node(t, n, n->right);
-    else if (n->right == t->nil)
-        replace_node(t, n, n->left);
-    else
-    {
-        y = tree_minimum(t, n->right);
-        if (y->parent != n)
-        {
-            replace_node(t, y, y->right);
-            y->right = n->right;
-            y->right->parent = y;
+
+  // del_target 자식에따라 바뀜
+  if (del_target->left == t->nil){  // 오른쪽만있을때
+      swap_target=del_target->right; 
+      replace_node(t,del_target,del_target->right); 
+  }
+  else if (del_target->right == t->nil){ // 왼쪽만 있을때
+      swap_target=del_target->left;      
+      replace_node(t,del_target,del_target->left); 
+  }else{                                        // 양쪽 다 있을때
+      extra_black=tree_minimum(t,del_target->right); 
+      successor=extra_black->color;
+      swap_target=extra_black->right;      
+      // 양쪽다 자식이있고 삭제할놈 바로밑에서 대체될놈을 가져올때         
+      if (extra_black->parent ==del_target &&    
+          extra_black->right !=t->nil){            
+          swap_target->parent=extra_black;         
+      }else{                                       
+          replace_node(t,extra_black,extra_black->right); 
+          extra_black->right=del_target->right;         
+          extra_black->right->parent=extra_black;          
+      }                                 
+      replace_node(t,del_target,extra_black);     
+      extra_black->left=del_target->left;         
+      extra_black->left->parent=extra_black;        
+      extra_black->color=del_target->color;       
+  }
+
+  if (successor == RBTREE_BLACK){             // 삭제할놈의 오리지널 컬러가 블랙이라면?
+      delete_fixup(t,swap_target);
+  }
+  free(del_target);
+
+}
+
+
+void delete_fixup(rbtree* t,node_t* x)
+{
+  node_t* brother;
+   while (x!=t->root && x->color == RBTREE_BLACK)
+   {
+        if(x == x->parent->left){  // left 일때
+              brother=x->parent->right; // 부라더 설정
+              // case  1 : 형제가 RED 일때
+              if (brother->color==RBTREE_RED){
+                  brother->color=RBTREE_BLACK;
+                  brother->parent->color=RBTREE_RED;
+                  rotate_left(t,brother->parent);
+                  brother=x->parent->right;
+              }
+
+              // case 2 : 형제의 양쪽 자식이 다 BLACK 일 떄
+              if (brother->left->color == RBTREE_BLACK &&
+                  brother->right->color == RBTREE_BLACK){
+                    brother->color=RBTREE_RED;
+                    x=x->parent;
+                  }
+              // case 3 : 형제의 오른쪽 자식이 BLACK 일 때
+              else {
+                if (brother->right->color == RBTREE_BLACK){
+                  brother->left->color = RBTREE_BLACK;
+                  brother->color = RBTREE_RED;
+                  rotate_right(t,brother);
+                  brother = x->parent->right; 
+                }
+                // case 4 : 형제의 왼쪽 자식이 BLACK 일 때
+                brother->color = x->parent->color;
+                x->parent->color = RBTREE_BLACK;
+                brother->right->color = RBTREE_BLACK;
+                rotate_left(t,x->parent);
+                x=t->root;
+              }
+        } 
+        else{ // right 일떄
+               brother=x->parent->left; // 부라더 설정
+              // case  1 : 형제가 RED 일때
+              if (brother->color==RBTREE_RED){
+                  brother->color=RBTREE_BLACK;
+                  brother->parent->color=RBTREE_RED;
+                  rotate_right(t,brother->parent);
+                  brother=x->parent->left;
+              }
+
+              // case 2 : 형제의 양쪽 자식이 다 BLACK 일 떄
+              if (brother->right->color == RBTREE_BLACK &&
+                  brother->left->color == RBTREE_BLACK){
+                    brother->color=RBTREE_RED;
+                    x=x->parent;
+                  }
+              // case 3 : 형제의 오른쪽 자식이 BLACK 일 때
+              else {
+                if (brother->left->color == RBTREE_BLACK){
+                    brother->right->color = RBTREE_BLACK;
+                    brother->color = RBTREE_RED;
+                    rotate_left(t,brother);
+                    brother = x->parent->left; 
+                  }
+                  // case 4 : 형제의 왼쪽 자식이 BLACK 일 때
+                  brother->color = x->parent->color;
+                  x->parent->color = RBTREE_BLACK;
+                  brother->left->color = RBTREE_BLACK;
+                  rotate_right(t,x->parent);
+                  x=t->root;
+              }
         }
-        replace_node(t, n, y);
-        y->left = n->left;
-        y->left->parent = y;
-    }
-    // if (y!=t->nil){
-    //     free(n);
-    //     printf("n해제");
-    // }
+   }
+   x->color=RBTREE_BLACK;
 }
 
-void delete_node(rbtree *t, node_t *n)
-{
-    node_t *child = (n->right == t->nil) ? n->left : n->right;
-    if (n == t->root)
-        return;
-    replace_node(t, n, child);
+// void delete_node(rbtree *t, node_t *n)
+// {
+//     node_t *child = (n->right == t->nil) ? n->left : n->right;
+//     if (n == t->root)
+//         return;
+//     replace_node(t, n, child);
     
-    // Debugging messages
-    printf("n->color: %d, child->color: %d\n", n->color, child->color);
-    if (n->color == RBTREE_BLACK)
-    {
-        printf("if 문 들어오나 ?\n");
-        if (child->color == RBTREE_RED)
-        {
-            child->color = RBTREE_BLACK;
-            printf("child->color set to RBTREE_BLACK\n");
-        }
-        else
-        { // case 1:
-            printf("fixed 호출\n");
-            erase_fixed(t, child);
-            printf("fixed 호출\n");
-            //visualize_tree(t,4);
+//     // Debugging messages
+//     printf("n->color: %d, child->color: %d\n", n->color, child->color);
+//     if (n->color == RBTREE_BLACK)
+//     {
+//         printf("if 문 들어오나 ?\n");
+//         if (child->color == RBTREE_RED)
+//         {
+//             child->color = RBTREE_BLACK;
+//             printf("child->color set to RBTREE_BLACK\n");
+//         }
+//         else
+//         { // case 1:
+//             // printf("fixed 호출\n");
+//             erase_fixed(t, child);
+//             // printf("fixed 호출\n");
+//             visualize_tree(t,4);
             
-        }
-    }
-    free(n);
-}
+//         }
+//     }
+//     free(n);
+// }
 
 
 void erase_fixed(rbtree *t, node_t *n)
@@ -219,6 +310,11 @@ void erase_fixed(rbtree *t, node_t *n)
         }
     }
 }
+
+
+
+
+
 
 node_t *tree_minimum(rbtree *t, node_t *x)
 {
